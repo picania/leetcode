@@ -135,6 +135,58 @@ mod merge_sorted_array {
 
 }
 
+mod remove_element {
+
+    pub struct Solution;
+
+    impl Solution {
+        pub fn remove_element(nums: &mut Vec<i32>, val: i32) -> i32 {
+            let mut len = nums.len();
+
+            for i in (0..len).rev() {
+                if nums[i] == val {
+                    nums[i..].rotate_left(1);
+                    len -= 1;
+                }
+            }
+
+            len as i32
+        }
+    }
+
+}
+
+// TODO: Очень долго выполняется. 12 мс - это дольше, чем у большинства.
+mod remove_duplicates_from_sorted_array {
+
+    pub struct Solution;
+
+    impl Solution {
+        pub fn remove_duplicates(nums: &mut Vec<i32>) -> i32 {
+            let mut len = nums.len();
+            let mut prev;
+
+            for i in 0..len {
+                if i >= len {
+                    break;
+                }
+
+                prev = nums[i];
+                let count = (&nums[i..]).iter().take_while(|x|{ **x == prev }).count();
+
+                if count > 1 {
+                    let offset = count - 1;
+                    nums[i + 1..].rotate_left(offset);
+                    len -= offset;
+                }
+            }
+
+            len as i32
+        }
+    }
+
+}
+
 #[cfg(test)]
 mod tests {
      #[test]
@@ -194,6 +246,34 @@ mod tests {
         let n = 0;
         Solution::merge(&mut nums1, m, &mut nums2, n);
         assert_eq!(nums1, [1]);
+    }
+
+    #[test]
+    fn remove_element() {
+        use super::remove_element::Solution;
+
+        let mut nums = vec![3,2,2,3];
+        let val = 3;
+        assert_eq!(Solution::remove_element(&mut nums, val), 2);
+        assert_eq!(nums[..2], [2,2]);
+
+        let mut nums = vec![0,1,2,2,3,0,4,2];
+        let val = 2;
+        assert_eq!(Solution::remove_element(&mut nums, val), 5);
+        assert_eq!(nums[..5], [0,1,3,0,4]);
+    }
+
+    #[test]
+    fn remove_duplicates_from_sorted_array() {
+        use super::remove_duplicates_from_sorted_array::Solution;
+
+        let mut nums = vec![1,1,2];
+        assert_eq!(Solution::remove_duplicates(&mut nums), 2);
+        assert_eq!(nums[..2], [1,2]);
+
+        let mut nums = vec![0,0,1,1,1,2,2,3,3,4];
+        assert_eq!(Solution::remove_duplicates(&mut nums), 5);
+        assert_eq!(nums[..5], [0,1,2,3,4]);
     }
 
 }
