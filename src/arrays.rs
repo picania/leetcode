@@ -187,8 +187,95 @@ mod remove_duplicates_from_sorted_array {
 
 }
 
+mod check_if_n_and_its_double_exist {
+
+    pub struct Solution;
+
+    impl Solution {
+        pub fn check_if_exist(arr: Vec<i32>) -> bool {
+            for (i, &v) in arr.iter().enumerate() {
+                // Пропускаем последний элемент
+                if i == arr.len() - 1 {
+                    break;
+                }
+
+                let r= arr[i + 1..].iter().find(|&&x|{
+                    x * 2 == v || x == v * 2
+                });
+
+                if let Some(_) = r {
+                    return true;
+                }
+            }
+
+            false
+        }
+    }
+
+}
+
+mod valid_mountain_array {
+
+    pub struct Solution;
+
+    enum State {
+        None,
+        Increase,
+        Decrease,
+    }
+
+    impl Solution {
+        pub fn valid_mountain_array(arr: Vec<i32>) -> bool {
+            if arr.len() < 3 {
+                return false;
+            }
+
+            let first = &arr[..arr.len() - 1];
+            let second = &arr[1..arr.len()];
+            let mut state = State::None;
+            let mut increase = false;
+            let mut decrease = false;
+
+            for (&f, &s) in first.iter().zip(second.iter()) {
+                match &mut state {
+                    State::None => {
+                        if f < s {
+                            state = State::Increase;
+                            increase = true;
+                        } else if s <= f {
+                            increase = false;
+                            break;
+                        }
+                    },
+                    State::Increase => {
+                        if f > s {
+                            state = State::Decrease;
+                            decrease = true;
+                        } else if f < s {
+                        } else {
+                            increase = false;
+                            break;
+                        }
+                    },
+                    State::Decrease => {
+                        if !(f > s) {
+                            decrease = false;
+                            break;
+                        }
+                    },
+                }
+
+            }
+
+            increase && decrease
+        }
+    }
+
+}
+
 #[cfg(test)]
 mod tests {
+
      #[test]
      fn max_consecutive_ones() {
          use super::max_consecutive_ones::Solution;
@@ -274,6 +361,40 @@ mod tests {
         let mut nums = vec![0,0,1,1,1,2,2,3,3,4];
         assert_eq!(Solution::remove_duplicates(&mut nums), 5);
         assert_eq!(nums[..5], [0,1,2,3,4]);
+    }
+
+    #[test]
+    fn check_if_n_and_its_double_exist() {
+        use super::check_if_n_and_its_double_exist::Solution;
+
+        let arr = vec![10,2,5,3];
+        assert_eq!(Solution::check_if_exist(arr), true);
+
+        let arr = vec![7,1,14,11];
+        assert_eq!(Solution::check_if_exist(arr), true);
+
+        let arr = vec![3,1,7,11];
+        assert_eq!(Solution::check_if_exist(arr), false);
+    }
+
+    #[test]
+    fn valid_mountain_array() {
+        use super::valid_mountain_array::Solution;
+
+        let arr = vec![2,1];
+        assert_eq!(Solution::valid_mountain_array(arr), false);
+
+        let arr = vec![1,1,1,1,1,1,1,2,1];
+        assert_eq!(Solution::valid_mountain_array(arr), false);
+
+        let arr = vec![2,1,2,3,5,7,9,10,12,14,15,16,18,14,13];
+        assert_eq!(Solution::valid_mountain_array(arr), false);
+
+        let arr = vec![0,3,2,1];
+        assert_eq!(Solution::valid_mountain_array(arr), true);
+
+        let arr = vec![0,1,2,3,4,5,4,3,2,1,0];
+        assert_eq!(Solution::valid_mountain_array(arr), true);
     }
 
 }
