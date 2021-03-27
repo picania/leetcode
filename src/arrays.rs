@@ -273,11 +273,146 @@ mod valid_mountain_array {
 
 }
 
+mod in_place {
+
+    // TODO: Плохой показатель по времени. Около 80 мс.
+    pub(crate) mod replace_elements_with_greatest_element_on_right_side {
+        pub struct Solution;
+
+        impl Solution {
+            pub fn replace_elements(mut arr: Vec<i32>) -> Vec<i32> {
+                let last = arr.len() - 1;
+                for i in 0..last {
+                    let (l, r) = arr.split_at_mut(i + 1);
+                    let max = r.iter().max().unwrap();
+
+                    *l.last_mut().unwrap() = *max;
+                }
+
+                arr[last] = -1;
+
+                arr
+            }
+        }
+    }
+
+    pub(crate) mod remove_duplicates_from_sorted_array {
+        pub struct Solution;
+
+        impl Solution {
+            pub fn remove_duplicates(nums: &mut Vec<i32>) -> i32 {
+                if nums.is_empty() {
+                    return 0;
+                }
+
+                let mut prev = 0;
+                for i in 1..nums.len() {
+                    if nums[prev] != nums[i] {
+                        prev += 1;
+                        nums[prev] = nums[i];
+                    }
+                }
+
+                (prev + 1) as i32
+            }
+        }
+    }
+
+    pub(crate) mod move_zeroes {
+        pub struct Solution;
+
+        impl Solution {
+            pub fn move_zeroes(nums: &mut Vec<i32>) {
+                let mut i = 0;
+                for j in 0..nums.len() {
+                    if nums[i] == 0 {
+                        if nums[j] != 0 {
+                            nums.swap(i, j);
+                            i += 1;
+                        }
+                    } else {
+                        i += 1;
+                    }
+                }
+            }
+        }
+    }
+
+    pub(crate) mod sort_array_by_parity {
+        pub struct Solution;
+
+        trait Parity {
+            fn is_even(&self) -> bool;
+            fn is_odd(&self) -> bool;
+        }
+
+        impl Parity for i32 {
+            fn is_even(&self) -> bool {
+                *self % 2 == 0
+            }
+            fn is_odd(&self) -> bool {
+                *self % 2 == 1
+            }
+        }
+
+        trait SortByParity {
+            fn sort_by_parity(&mut self);
+        }
+
+        impl SortByParity for [i32] {
+            fn sort_by_parity(&mut self) {
+                let mut i = 0;
+                for j in 0..self.len() {
+                    if self[i].is_odd() {
+                        if self[j].is_even() {
+                            self.swap(i, j);
+                            i += 1;
+                        }
+                    } else {
+                        i += 1;
+                    }
+                }
+            }
+        }
+
+        impl Solution {
+            pub fn sort_array_by_parity(mut a: Vec<i32>) -> Vec<i32> {
+                a.sort_by_parity();
+
+                a
+            }
+        }
+    }
+
+    pub(crate) mod remove_element {
+        pub struct Solution;
+
+        impl Solution {
+            pub fn remove_element(nums: &mut Vec<i32>, val: i32) -> i32 {
+                let mut i = 0;
+                for j in 0..nums.len() {
+                    if nums[i] == val {
+                        if nums[j] != val {
+                            nums.swap(i, j);
+                            i += 1;
+                        }
+                    } else {
+                        i += 1;
+                    }
+                }
+
+                i as i32
+            }
+        }
+    }
+
+}
+
 #[cfg(test)]
 mod tests {
 
-     #[test]
-     fn max_consecutive_ones() {
+    #[test]
+    fn max_consecutive_ones() {
          use super::max_consecutive_ones::Solution;
 
          assert_eq!(Solution::find_max_consecutive_ones(vec![1,1,0,1,1,1]), 3);
@@ -397,4 +532,97 @@ mod tests {
         assert_eq!(Solution::valid_mountain_array(arr), true);
     }
 
+    mod in_place {
+        #[test]
+        fn replace_elements_with_greatest_element_on_right_side() {
+            use crate::arrays::in_place::replace_elements_with_greatest_element_on_right_side::Solution;
+
+            let arr = vec![17, 18, 5, 4, 6, 1];
+            assert_eq!(Solution::replace_elements(arr), [18, 6, 6, 6, 1, -1]);
+
+            let arr = vec![400];
+            assert_eq!(Solution::replace_elements(arr), [-1]);
+        }
+
+        #[test]
+        fn remove_duplicates_from_sorted_array() {
+            use crate::arrays::in_place::remove_duplicates_from_sorted_array::Solution;
+
+            let mut nums = vec![1, 1, 2];
+            let output = 2;
+            assert_eq!(output, Solution::remove_duplicates(&mut nums));
+            assert_eq!(vec![1, 2], nums[..output as usize]);
+
+            let mut nums = vec![0, 0, 1, 1, 1, 2, 2, 3, 3, 4];
+            let output = 5;
+            assert_eq!(output, Solution::remove_duplicates(&mut nums));
+            assert_eq!(vec![0, 1, 2, 3, 4], nums[..output as usize]);
+
+            let mut nums = vec![0, 1, 2, 3];
+            assert_eq!(4, Solution::remove_duplicates(&mut nums));
+            assert_eq!(vec![0, 1, 2, 3], nums);
+
+            let mut nums = vec![1, 2, 2];
+            assert_eq!(2, Solution::remove_duplicates(&mut nums));
+            assert_eq!(vec![1, 2], nums[..2]);
+
+            let mut nums = vec![0; 0];
+            assert_eq!(0, Solution::remove_duplicates(&mut nums));
+        }
+
+        #[test]
+        fn move_zeroes() {
+            use crate::arrays::in_place::move_zeroes::Solution;
+
+            let mut nums = vec![0,1,0,3,12];
+            Solution::move_zeroes(&mut nums);
+            assert_eq!(vec![1,3,12,0,0], nums);
+
+            let mut nums = vec![0];
+            Solution::move_zeroes(&mut nums);
+            assert_eq!(vec![0], nums);
+
+            let mut nums = vec![0,0,0,0,0,0];
+            Solution::move_zeroes(&mut nums);
+            assert_eq!(vec![0,0,0,0,0,0], nums);
+
+            let mut nums = vec![1,2,0,0,0,0];
+            Solution::move_zeroes(&mut nums);
+            assert_eq!(vec![1,2,0,0,0,0], nums);
+
+            let mut nums = vec![0,0,1,2,0,0];
+            Solution::move_zeroes(&mut nums);
+            assert_eq!(vec![1,2,0,0,0,0], nums);
+
+            let mut nums = vec![0,0,0,0,1,2];
+            Solution::move_zeroes(&mut nums);
+            assert_eq!(vec![1,2,0,0,0,0], nums);
+        }
+
+        #[test]
+        fn sort_array_by_parity() {
+            use crate::arrays::in_place::sort_array_by_parity::Solution;
+
+            let nums = vec![3,1,2,4];
+            assert_eq!(vec![2,4,3,1], Solution::sort_array_by_parity(nums));
+
+            let nums = vec![1,2,3,4,5,6];
+            assert_eq!(vec![2,4,6,1,5,3], Solution::sort_array_by_parity(nums));
+        }
+
+        #[test]
+        fn remove_element() {
+            use crate::arrays::in_place::remove_element::Solution;
+
+            let mut nums = vec![3,2,2,3];
+            let val = 3;
+            assert_eq!(Solution::remove_element(&mut nums, val), 2);
+            assert_eq!(nums[..2], [2,2]);
+
+            let mut nums = vec![0,1,2,2,3,0,4,2];
+            let val = 2;
+            assert_eq!(Solution::remove_element(&mut nums, val), 5);
+            assert_eq!(nums[..5], [0,1,3,0,4]);
+        }
+    }
 }
