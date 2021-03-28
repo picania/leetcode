@@ -408,6 +408,139 @@ mod in_place {
 
 }
 
+mod height_checker {
+    pub struct Solution;
+
+    impl Solution {
+        pub fn height_checker(heights: Vec<i32>) -> i32 {
+            let sorted = {
+                let mut v = heights.clone();
+                v.sort_unstable();
+                v
+            };
+
+            let count = sorted.into_iter().zip(heights.into_iter())
+                .filter(|(x, y)| *x != *y)
+                .count();
+
+            count as i32
+        }
+    }
+}
+
+// TODO: Хоспади, какая же каша из if/else. Может можно сделать аккуратнее за O(n)?
+mod third_maximum_number {
+    pub struct Solution;
+
+    impl Solution {
+        pub fn third_max(nums: Vec<i32>) -> i32 {
+            let mut heap: [Option<i32>; 3] = [None; 3];
+
+            for i in nums {
+                if heap[0].is_none() {
+                    heap[0] = Some(i);
+                } else if *heap[0].as_ref().unwrap() > i {
+                    if heap[1].is_none() {
+                        heap[1] = Some(i);
+                    } else if *heap[1].as_ref().unwrap() < i {
+                        heap.swap(1, 2);
+                        heap[1] = Some(i);
+                    } else if *heap[1].as_ref().unwrap() != i {
+                        if heap[2].is_none() || *heap[2].as_ref().unwrap() < i {
+                            heap[2] = Some(i);
+                        }
+                    }
+                } else if *heap[0].as_ref().unwrap() < i {
+                    heap.rotate_right(1);
+                    heap[0] = Some(i);
+
+                    if heap[1].is_some() && heap[2].is_some() {
+                        if *heap[1].as_ref().unwrap() < *heap[2].as_ref().unwrap() {
+                            heap.swap(1, 2);
+                        }
+                    }
+                }
+            }
+
+            let r = if let Some(v) = heap[2] {
+                v
+            } else {
+                heap[0].unwrap()
+            };
+
+            r
+        }
+    }
+}
+
+mod find_all_numbers_disappeared_in_an_array {
+    pub struct Solution;
+
+    impl Solution {
+        pub fn find_disappeared_numbers(nums: Vec<i32>) -> Vec<i32> {
+            let mut out = (1..=nums.len() as i32).collect::<Vec<_>>();
+
+            for i in nums {
+                out[(i - 1) as usize] = 0;
+            }
+
+            out.retain(|x| *x != 0);
+            out
+        }
+    }
+}
+
+mod squares_of_a_sorted_array_ii {
+    use std::cmp::Ordering;
+
+    pub struct Solution;
+
+    impl Solution {
+        pub fn sorted_squares(nums: Vec<i32>) -> Vec<i32> {
+            let mut beg = 0;
+            let mut end = nums.len() - 1;
+            let mut out = vec![0; nums.len()];
+            let mut out_index = end;
+
+            while beg <= end {
+                let b = nums[beg] * nums[beg];
+                let e = nums[end] * nums[end];
+
+                match b.cmp(&e) {
+                    Ordering::Less => {
+                        out[out_index] = e;
+
+                        end -= 1;
+                        out_index -= 1;
+                    }
+                    Ordering::Greater => {
+                        out[out_index] = b;
+
+                        beg += 1;
+                        out_index -= 1;
+                    }
+                    Ordering::Equal => {
+                        if beg < end {
+                            out[out_index] = e;
+                            out_index -= 1;
+                            out[out_index] = b;
+                            out_index -= 1;
+                        } else {
+                            out[out_index] = e;
+                            break;
+                        }
+
+                        end -= 1;
+                        beg += 1;
+                    }
+                }
+            }
+
+            out
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
 
@@ -624,5 +757,59 @@ mod tests {
             assert_eq!(Solution::remove_element(&mut nums, val), 5);
             assert_eq!(nums[..5], [0,1,3,0,4]);
         }
+    }
+
+    #[test]
+    fn height_checker() {
+        use crate::arrays::height_checker::Solution;
+
+        let heights = vec![1,1,4,2,1,3];
+        assert_eq!(3, Solution::height_checker(heights));
+
+        let heights = vec![5,1,2,3,4];
+        assert_eq!(5, Solution::height_checker(heights));
+
+        let heights = vec![1,2,3,4,5];
+        assert_eq!(0, Solution::height_checker(heights));
+    }
+
+    #[test]
+    fn third_maximum_number() {
+        use crate::arrays::third_maximum_number::Solution;
+
+        let nums = vec![3,2,1];
+        assert_eq!(1, Solution::third_max(nums));
+
+        let nums = vec![1,2];
+        assert_eq!(2, Solution::third_max(nums));
+
+        let nums = vec![2,2,3,1];
+        assert_eq!(1, Solution::third_max(nums));
+
+        let nums = vec![5,2,2];
+        assert_eq!(5, Solution::third_max(nums));
+
+        let nums = vec![5,2,4,1,3,6,0];
+        assert_eq!(4, Solution::third_max(nums));
+    }
+
+    #[test]
+    fn find_all_numbers_disappeared_in_an_array() {
+        use crate::arrays::find_all_numbers_disappeared_in_an_array::Solution;
+
+        let nums = vec![4,3,2,7,8,2,3,1];
+        assert_eq!(vec![5,6], Solution::find_disappeared_numbers(nums));
+
+        let nums = vec![1,1];
+        assert_eq!(vec![2], Solution::find_disappeared_numbers(nums));
+    }
+
+    #[test]
+    fn squares_of_a_sorted_array_ii() {
+        use crate::arrays::squares_of_a_sorted_array_ii::Solution;
+
+        assert_eq!(vec![0,1,9,16,100], Solution::sorted_squares(vec![-4,-1,0,3,10]));
+        assert_eq!(vec![4,9,9,49,121], Solution::sorted_squares(vec![-7,-3,2,3,11]));
+        assert_eq!(vec![1], Solution::sorted_squares(vec![1]));
     }
 }
