@@ -1,2 +1,2 @@
-mod arrays;
-mod problems;
+pub mod arrays;
+pub mod grind75;
