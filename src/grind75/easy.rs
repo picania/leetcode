@@ -67,6 +67,70 @@ pub mod valid_parentheses {
     }
 }
 
+/// An implementation of [Merge Two Sorted Lists](https://leetcode.com/problems/merge-two-sorted-lists/description/) problem.
+mod merge_two_sorted_lists {
+
+    pub struct ListNode {
+        pub val: i32,
+        pub next: Option<Box<ListNode>>,
+    }
+
+    impl ListNode {
+        #[inline]
+        fn new(val: i32) -> Self {
+            ListNode { next: None, val }
+        }
+    }
+    struct Solution;
+
+    impl Solution {
+        #[allow(unused)]
+        pub fn merge_two_lists(
+            list1: Option<Box<ListNode>>,
+            list2: Option<Box<ListNode>>,
+        ) -> Option<Box<ListNode>> {
+            // if let None = list1 {
+            //     return list2;
+            // }
+
+            // if let None = list2 {
+            //     return list1;
+            // }
+
+            // let mut head = None;
+            // let mut current = None;
+            // let mut first = list1;
+            // let mut second = list2;
+            // loop {
+            //     match (first, second) {
+            //         (Some(ref f), Some(ref s)) => {
+            //             match f.val.cmp(&s.val) {
+            //                 std::cmp::Ordering::Less => {
+            //                     if let None = head.as_ref() {
+            //                         head = Some(Box::new(ListNode::new(first.as_ref().unwrap().val)));
+            //                         current = head.as_mut();
+            //                         first = f.next;
+            //                     } else {
+
+            //                     }
+            //                 },
+            //                 std::cmp::Ordering::Equal => todo!(),
+            //                 std::cmp::Ordering::Greater => todo!(),
+            //             }
+            //         },
+            //         (None, Some(s)) => {},
+            //         (Some(f), None) => {},
+            //         (None, None) => break,
+            //     }
+
+            // }
+            
+            // head
+            todo!("work in progress...");
+        }    
+    }
+}
+
 #[cfg(test)]
 mod tests {
 
@@ -109,4 +173,7 @@ mod tests {
         assert!(!Solution::is_valid("[])".into()));
         assert!(!Solution::is_valid("(])".into()));
     }
+
+    #[test]
+    fn merge_two_sorted_lists() {}
 }
